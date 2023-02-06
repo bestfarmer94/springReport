@@ -1,12 +1,10 @@
 package com.sparta.springreport.controller;
 
 import com.sparta.springreport.dto.PostRequestDto;
+import com.sparta.springreport.dto.PostResponseDto;
 import com.sparta.springreport.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -23,13 +21,27 @@ public class PostController {
     }
 
     @GetMapping("/api/posts")
-    public List<PostRequestDto> getPostList() {
+    public List<PostResponseDto> getPostList() {
         return postService.getPostList();
     }
 
     @PostMapping("/api/post")
-    public String makePost(@RequestBody PostRequestDto postRequestDto){
-        postService.makePost(postRequestDto);
-        return "완료";
+    public PostResponseDto makePost(@RequestBody PostRequestDto postRequestDto){
+        return postService.makePost(postRequestDto);
+    }
+
+    @GetMapping("/api/post/{id}")
+    public PostResponseDto details(@PathVariable Long id){
+        return postService.findOne(id);
+    }
+
+    @PutMapping("/api/post/{id}")
+    public PostResponseDto update(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
+        return postService.update(id, postRequestDto);
+    }
+
+    @DeleteMapping("/api/post/{id}")
+    public String delete(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
+        return "{success : " + postService.delete(id, postRequestDto) + "}";
     }
 }
