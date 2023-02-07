@@ -1,5 +1,7 @@
 package com.sparta.springreport.controller;
 
+import com.sparta.springreport.dto.PostDictionary;
+import com.sparta.springreport.dto.PostPassword;
 import com.sparta.springreport.dto.PostRequestDto;
 import com.sparta.springreport.dto.PostResponseDto;
 import com.sparta.springreport.service.PostService;
@@ -36,12 +38,12 @@ public class PostController {
     }
 
     @PutMapping("/api/post/{id}")
-    public PostResponseDto update(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
-        return postService.update(id, postRequestDto);
+    public PostResponseDto update(@PathVariable Long id, @RequestBody PostDictionary postDictionary){
+        return postService.update(id, postDictionary);
     }
 
     @DeleteMapping("/api/post/{id}")
-    public String delete(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
-        return "{success : " + postService.delete(id, postRequestDto) + "}";
+    public String delete(@PathVariable Long id, @RequestBody PostPassword postPassword){
+        return "{success : " + postService.delete(id, postPassword) + "}";
     }
 }

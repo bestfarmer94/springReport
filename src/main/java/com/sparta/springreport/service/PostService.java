@@ -1,5 +1,7 @@
 package com.sparta.springreport.service;
 
+import com.sparta.springreport.dto.PostDictionary;
+import com.sparta.springreport.dto.PostPassword;
 import com.sparta.springreport.dto.PostRequestDto;
 import com.sparta.springreport.dto.PostResponseDto;
 import com.sparta.springreport.entity.Post;
@@ -22,8 +24,9 @@ public class PostService {
         List<Post> list = postRepository.findAllByOrderByCreatedAtDesc();
 
         List<PostResponseDto> result = new ArrayList<>();
+
         for (Post post : list) {
-            result.add(entityToDto(post));
+            result.add(new PostResponseDto().entityToDto(post));
         }
 
         return result;
@@ -32,39 +35,43 @@ public class PostService {
     @Transactional
     public PostResponseDto makePost(PostRequestDto postRequestDto) {
         Post post = new Post(postRequestDto);
-        postRepository.save(post);
-        return entityToDto(post);
+        for(int i=0; i<1000; i++){
+            post = new Post(postRequestDto);
+            postRepository.save(post);
+        }
+        return new PostResponseDto().entityToDto(post);
     }
 
     @Transactional
     public PostResponseDto findOne(Long id) {
-        return entityToDto(findById(id));
+        return new PostResponseDto().entityToDto(findById(id));
     }
 
     @Transactional
-    public PostResponseDto update(Long id, PostRequestDto postRequestDto) {
+    public PostResponseDto update(Long id, PostDictionary postDictionary) {
         Post post = findById(id);
 
-        if(confirm_password(postRequestDto, post)){
-            post.update(postRequestDto);
+        if(confirm_password(postDictionary.getPassword(), post)){
+            post.update(postDictionary.getPostRequestDto());
         }
 
-        return entityToDto(post);
+        return new PostResponseDto().entityToDto(post);
     }
 
     @Transactional
-    public boolean delete(Long id, PostRequestDto postRequestDto) {
+    public boolean delete(Long id, PostPassword postPassword) {
         Post post = findById(id);
-        boolean success = confirm_password(postRequestDto, post);
+        boolean success = confirm_password(postPassword.getPassword(), post);
         if(success){
             postRepository.deleteById(id);
         }
         return success;
     }
 
-    public PostResponseDto entityToDto(Post post){
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getAuthor(), post.getContents(), post.getCreatedAt());
-    }
+    // 캡슐화 관점에서 DTO 안으로 옮겼다.
+//    public PostResponseDto entityToDto(Post post){
+//        return new PostResponseDto(post.getId(), , , , , )
+//    }
 
     public Post findById(Long id) {
         Post post = postRepository.findById(id).orElseThrow(
@@ -73,7 +80,7 @@ public class PostService {
         return post;
     }
 
-    public boolean confirm_password(PostRequestDto postRequestDto, Post post){
-        return postRequestDto.getPassword().equals(post.getPassword());
+    public boolean confirm_password(String password, Post post){
+        return password.equals(post.getPassword());
     }
 }
